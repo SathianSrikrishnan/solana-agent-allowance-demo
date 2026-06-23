@@ -29,4 +29,4 @@ Canada angle: I think this matters for practical commerce, fintech, and AI workf
 
 Demo repo: https://github.com/SathianSrikrishnan/solana-agent-allowance-demo
 
-Deep dive: https://github.com/SathianSrikrishnan/solana-agent-allowance-demo/blob/main/docs/deep-dive.md
+Deep dive: https://sathian.ai/writings/agent-allowance-lab
