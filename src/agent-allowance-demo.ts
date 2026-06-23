@@ -60,6 +60,13 @@ type StepReceipt = {
   status: StepStatus;
 };
 
+class FundingRequiredError extends Error {
+  constructor() {
+    super('Funding required. See .demo-state/funding-required.json.');
+    this.name = 'FundingRequiredError';
+  }
+}
+
 function createProofClient(payer: KeyPairSigner) {
   const rpcUrl = process.env.SOLANA_RPC_URL ?? process.env.RPC_URL;
   return createClient()
@@ -177,12 +184,12 @@ async function ensurePayerFunded(client: ProofClient, payer: KeyPairSigner): Pro
     balance = await getBalanceLamports(client, payer.address);
   } catch (error) {
     await printFundingRequired(payer.address, balance, error);
-    process.exit(2);
+    throw new FundingRequiredError();
   }
 
   if (balance < MIN_PAYER_BALANCE_LAMPORTS) {
     await printFundingRequired(payer.address, balance);
-    process.exit(2);
+    throw new FundingRequiredError();
   }
 
   return balance;
@@ -402,6 +409,11 @@ async function main(): Promise<void> {
 }
 
 main().catch(error => {
+  if (error instanceof FundingRequiredError) {
+    process.exitCode = 2;
+    return;
+  }
+
   console.error(
     JSON.stringify(
       {
