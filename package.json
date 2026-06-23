@@ -1,0 +1,25 @@
+{
+  "name": "solana-agent-allowance-demo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Agent Allowance Lab: a Solana Native Subscriptions & Allowances demo for wallet-safe AI agent budgets.",
+  "scripts": {
+    "demo": "tsx src/agent-allowance-demo.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@solana-program/system": "^0.12.0",
+    "@solana-program/token": "^0.13.0",
+    "@solana/kit": "^6.9.0",
+    "@solana/kit-plugin-rpc": "^0.11.1",
+    "@solana/kit-plugin-signer": "^0.10.0",
+    "@solana/subscriptions": "^0.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.7.0",
+    "tsx": "^4.22.0",
+    "typescript": "^5.9.3"
+  }
+}
+
