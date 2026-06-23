@@ -1,0 +1,84 @@
+{
+  "status": "COMPLETE",
+  "demo": "Agent Allowance Lab",
+  "summary": "A wallet owner granted an AI agent a capped fixed allowance. Two pulls succeeded inside the cap; a larger pull failed closed.",
+  "network": "devnet",
+  "program": "Solana Native Subscriptions & Allowances",
+  "programId": "De1egAFMkMWZSN5rYXRj9CAdheBamobVNubTsi9avR44",
+  "actors": {
+    "payer": "2qSRyBv9WU8ZjH8PB1EHgQWHcq7AGyn7y4TrBW2kmtrx",
+    "user": "53pAyJXwEnSGBsojnKk4swUZQsAwFWrNXkzNvAxC3hJB",
+    "agent": "S8vtSxPbGUX6QVEKwcartkZjXBpWQ1aCyE2NJLJhQV2"
+  },
+  "mint": "4YrGYjcX8zkDPVKxyX63jEcqCrA7Ty1TmaQA2VCsuWxU",
+  "subscriptionAuthority": "7tB2DxRKJVJf11nFgnCWfYfzmA5Xrr1dGpmcBUL5Tfzj",
+  "delegationPda": "MU6pqrkX5doE2ac6hzRy7sGBbpTu8NRLDQpWGagkcmE",
+  "tokenAccounts": {
+    "userAta": "8nDDAAYqyKT2bm6faRNvp4V1d61ZbsGXj6S7oNC8VXdn",
+    "agentAta": "E3nQMTJPkiS1UxDH8DN5Avs2kSX1FzwMzQsJ3gJg7LC6"
+  },
+  "allowance": {
+    "grantedTestUsdc": "7.00",
+    "firstSpendTestUsdc": "2.00",
+    "secondSpendTestUsdc": "5.00",
+    "deniedAttemptTestUsdc": "8.00",
+    "remainingBaseUnits": "0",
+    "expiryTs": "1782237583"
+  },
+  "balances": {
+    "userBaseUnits": "3000000",
+    "agentBaseUnits": "7000000"
+  },
+  "explorer": {
+    "payer": "https://explorer.solana.com/address/2qSRyBv9WU8ZjH8PB1EHgQWHcq7AGyn7y4TrBW2kmtrx?cluster=devnet",
+    "user": "https://explorer.solana.com/address/53pAyJXwEnSGBsojnKk4swUZQsAwFWrNXkzNvAxC3hJB?cluster=devnet",
+    "agent": "https://explorer.solana.com/address/S8vtSxPbGUX6QVEKwcartkZjXBpWQ1aCyE2NJLJhQV2?cluster=devnet",
+    "mint": "https://explorer.solana.com/address/4YrGYjcX8zkDPVKxyX63jEcqCrA7Ty1TmaQA2VCsuWxU?cluster=devnet",
+    "subscriptionAuthority": "https://explorer.solana.com/address/7tB2DxRKJVJf11nFgnCWfYfzmA5Xrr1dGpmcBUL5Tfzj?cluster=devnet",
+    "delegationPda": "https://explorer.solana.com/address/MU6pqrkX5doE2ac6hzRy7sGBbpTu8NRLDQpWGagkcmE?cluster=devnet"
+  },
+  "receipts": {
+    "create-test-usdc-mint": {
+      "explorer": "https://explorer.solana.com/tx/4crQ4TDGgc12JWfAPFd7bmx6Ys89yW32CdF8dvE7ZuvzrbA6z3u7bnu7AdRX4bXhXFnmGm8gaPXThacNwKj9bS9g?cluster=devnet",
+      "signature": "4crQ4TDGgc12JWfAPFd7bmx6Ys89yW32CdF8dvE7ZuvzrbA6z3u7bnu7AdRX4bXhXFnmGm8gaPXThacNwKj9bS9g",
+      "status": "CONFIRMED"
+    },
+    "mint-user-balance": {
+      "explorer": "https://explorer.solana.com/tx/5P4aKfgmM1DCSGqWXnxHAkN61rsXXV7pxuqo8p7z9DznzXCEwNf4PBjmQmoqrbZ1LXBYeDWdrj5cpmb8R2TVYtu3?cluster=devnet",
+      "signature": "5P4aKfgmM1DCSGqWXnxHAkN61rsXXV7pxuqo8p7z9DznzXCEwNf4PBjmQmoqrbZ1LXBYeDWdrj5cpmb8R2TVYtu3",
+      "status": "CONFIRMED"
+    },
+    "init-user-allowance-authority": {
+      "explorer": "https://explorer.solana.com/tx/57PTTYJPhpGbcxzYrqqZK4UAmo7wkpmdUHmeh8DwQyywidUtZNF4JcvjsEKWaAdjaFKo9ybx3LWEnyCH6tXTrw63?cluster=devnet",
+      "signature": "57PTTYJPhpGbcxzYrqqZK4UAmo7wkpmdUHmeh8DwQyywidUtZNF4JcvjsEKWaAdjaFKo9ybx3LWEnyCH6tXTrw63",
+      "status": "CONFIRMED"
+    },
+    "user-grants-agent-fixed-allowance": {
+      "explorer": "https://explorer.solana.com/tx/2HaEGNK4rjq7XpucoyAWenUZ15hA1ndyChUyNCQw3xaeHFB9WfJ67AwzQk8DEBrUqFqy6F5dHxc654XLaV3zSZru?cluster=devnet",
+      "signature": "2HaEGNK4rjq7XpucoyAWenUZ15hA1ndyChUyNCQw3xaeHFB9WfJ67AwzQk8DEBrUqFqy6F5dHxc654XLaV3zSZru",
+      "status": "CONFIRMED"
+    },
+    "create-agent-receiver-token-account": {
+      "explorer": "https://explorer.solana.com/tx/5czAHa2Lv6bZXN3kxQjKVRjNGKVmeoahuhYZVQPaugfJTSiCdrshsBVfgzFnwPqUsfmriuQmDvV6KS477Xy7BR1z?cluster=devnet",
+      "signature": "5czAHa2Lv6bZXN3kxQjKVRjNGKVmeoahuhYZVQPaugfJTSiCdrshsBVfgzFnwPqUsfmriuQmDvV6KS477Xy7BR1z",
+      "status": "CONFIRMED"
+    },
+    "agent-spends-2-test-usdc": {
+      "explorer": "https://explorer.solana.com/tx/3D83bmkrtLApVM5w7MtjucvinKdBeKkxd8bNFQtj6XSFCQE9qPy9Jdb6xuEfHQdkMr3MfN2PydSW7cgyJhSLQwC4?cluster=devnet",
+      "signature": "3D83bmkrtLApVM5w7MtjucvinKdBeKkxd8bNFQtj6XSFCQE9qPy9Jdb6xuEfHQdkMr3MfN2PydSW7cgyJhSLQwC4",
+      "status": "CONFIRMED",
+      "amount": "2.00"
+    },
+    "agent-spends-5-test-usdc": {
+      "explorer": "https://explorer.solana.com/tx/2bQT73dtMqoRQShFFXwRYXRsXtyrMifbVwwCx4SJt5vqaAaYY34VEMxdae9vFrm4tkMjnvdiEq5iEUhoVasvsMeo?cluster=devnet",
+      "signature": "2bQT73dtMqoRQShFFXwRYXRsXtyrMifbVwwCx4SJt5vqaAaYY34VEMxdae9vFrm4tkMjnvdiEq5iEUhoVasvsMeo",
+      "status": "CONFIRMED",
+      "amount": "5.00"
+    },
+    "agent-over-budget-attempt": {
+      "amount": "8.00",
+      "reason": "Failed to send transaction (preflight): Custom program error: #300 (instruction #2)\n\nLogs:\n  > Program ComputeBudget111111111111111111111111111111 invoke [1]\n  > Program ComputeBudget111111111111111111111111111111 success\n  > Program De1egAFMkMWZSN5rYXRj9CAdheBamobVNubTsi9avR44 invoke [1]\n  > Program De1egAFMkMWZSN5rYXRj9CAdheBamobVNubTsi9avR44 consumed 868 of 1399850 compute units\n  > Program De1egAFMkMWZSN5rYXRj9CAdheBamobVNubTsi9avR44 failed: custom program error: 0x12c\n",
+      "status": "DENIED"
+    }
+  }
+}

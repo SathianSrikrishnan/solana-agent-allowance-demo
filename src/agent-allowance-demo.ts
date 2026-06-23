@@ -35,9 +35,13 @@ const RECEIPTS_DIR = join(ROOT_DIR, 'receipts');
 const PAYER_KEYPAIR_PATH = join(STATE_DIR, 'devnet-payer.json');
 const USER_KEYPAIR_PATH = join(STATE_DIR, 'devnet-user.json');
 const AGENT_KEYPAIR_PATH = join(STATE_DIR, 'devnet-agent.json');
+const DEVNET_RPC_URL = 'https://api.devnet.solana.com';
 
 const MIN_PAYER_BALANCE_LAMPORTS = 75_000_000n;
 const AIRDROP_LAMPORTS = 100_000_000n;
+const STEP_DELAY_MS = Number(process.env.DEMO_STEP_DELAY_MS ?? '1500');
+const SEND_RETRY_ATTEMPTS = Number(process.env.DEMO_SEND_RETRY_ATTEMPTS ?? '4');
+const SEND_RETRY_BASE_DELAY_MS = Number(process.env.DEMO_SEND_RETRY_BASE_DELAY_MS ?? '1500');
 
 const DECIMALS = 6;
 const TEST_USDC = 1_000_000n;
@@ -67,11 +71,20 @@ class FundingRequiredError extends Error {
   }
 }
 
+type SignatureStatusValue = {
+  confirmationStatus?: string | null;
+  err?: unknown;
+};
+
+function getRpcUrl(): string {
+  return process.env.SOLANA_RPC_URL ?? process.env.RPC_URL ?? DEVNET_RPC_URL;
+}
+
 function createProofClient(payer: KeyPairSigner) {
-  const rpcUrl = process.env.SOLANA_RPC_URL ?? process.env.RPC_URL;
+  const rpcUrl = getRpcUrl();
   return createClient()
     .use(signer(payer))
-    .use(rpcUrl ? solanaDevnetRpc({ rpcUrl }) : solanaDevnetRpc())
+    .use(solanaDevnetRpc({ rpcUrl }))
     .use(systemProgram())
     .use(tokenProgram())
     .use(subscriptionsProgram());
@@ -117,26 +130,111 @@ function errorMessage(error: unknown): string {
   return error == null ? 'unknown error' : String(error);
 }
 
+function jsonReplacer(_key: string, value: unknown): unknown {
+  return typeof value === 'bigint' ? value.toString() : value;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function isRateLimitError(error: unknown): boolean {
+  const message = errorMessage(error).toLowerCase();
+  return message.includes('429') || message.includes('too many requests');
+}
+
+function extractSignature(error: unknown): string | null {
+  const match = errorMessage(error).match(/Failed to send transaction \(([^)]+)\):/);
+  return match?.[1] ?? null;
+}
+
+async function getSignatureStatus(signature: string): Promise<SignatureStatusValue | null> {
+  const response = await fetch(getRpcUrl(), {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      id: 1,
+      jsonrpc: '2.0',
+      method: 'getSignatureStatuses',
+      params: [[signature], { searchTransactionHistory: true }],
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Signature status RPC failed: ${response.status} ${response.statusText}`);
+  }
+
+  const payload = (await response.json()) as {
+    result?: { value?: Array<SignatureStatusValue | null> };
+  };
+  return payload.result?.value?.[0] ?? null;
+}
+
+async function waitForConfirmedSignature(signature: string): Promise<SignatureStatusValue | null> {
+  for (let attempt = 1; attempt <= 8; attempt += 1) {
+    const status = await getSignatureStatus(signature);
+    if (status?.confirmationStatus === 'confirmed' || status?.confirmationStatus === 'finalized') {
+      return status;
+    }
+    await sleep(1000);
+  }
+  return null;
+}
+
 async function writeJson(path: string, value: unknown): Promise<void> {
   await mkdir(dirname(path), { recursive: true });
   await writeFile(
     path,
-    `${JSON.stringify(value, (_key, item) => (typeof item === 'bigint' ? item.toString() : item), 2)}\n`,
+    `${JSON.stringify(value, jsonReplacer, 2)}\n`,
   );
 }
 
 async function sendStep(step: string, plan: TransactionPlanSender): Promise<StepReceipt> {
   console.log(`running:${step}`);
-  const result = await plan.sendTransaction();
-  const summary = summarizeTransactionPlanResult(result);
-  if (!summary.successful || summary.successfulTransactions.length === 0) {
-    throw new Error(`Transaction step failed: ${step}`);
+  let signature: string | null = null;
+
+  for (let attempt = 1; attempt <= SEND_RETRY_ATTEMPTS; attempt += 1) {
+    try {
+      const result = await plan.sendTransaction();
+      const summary = summarizeTransactionPlanResult(result);
+      if (!summary.successful || summary.successfulTransactions.length === 0) {
+        throw new Error(`Transaction step failed: ${step}`);
+      }
+      if (summary.successfulTransactions.length > 1) {
+        throw new Error(`Transaction step produced multiple receipts: ${step}`);
+      }
+      signature = String(summary.successfulTransactions[0]!.context.signature);
+      break;
+    } catch (error) {
+      signature = extractSignature(error);
+      if (signature) {
+        const status = await waitForConfirmedSignature(signature);
+        if (status?.err) {
+          throw new Error(`Transaction step failed on-chain: ${step}: ${JSON.stringify(status.err)}`);
+        }
+        if (status) {
+          console.log(`recovered-confirmed:${step}:${explorerTx(signature)}`);
+          break;
+        }
+        throw new Error(`Transaction step has ambiguous RPC status: ${step}: ${signature}`);
+      }
+
+      if (!isRateLimitError(error) || attempt === SEND_RETRY_ATTEMPTS) {
+        throw error;
+      }
+
+      const delay = SEND_RETRY_BASE_DELAY_MS * attempt;
+      console.log(`retry:${step}:attempt ${attempt + 1}/${SEND_RETRY_ATTEMPTS}:waiting ${delay}ms`);
+      await sleep(delay);
+    }
   }
-  if (summary.successfulTransactions.length > 1) {
-    throw new Error(`Transaction step produced multiple receipts: ${step}`);
+
+  if (!signature) {
+    throw new Error(`Transaction step did not produce a signature: ${step}`);
   }
-  const signature = String(summary.successfulTransactions[0]!.context.signature);
+
   console.log(`confirmed:${step}:${explorerTx(signature)}`);
+  await sleep(STEP_DELAY_MS);
   return {
     explorer: explorerTx(signature),
     signature,
@@ -405,7 +503,7 @@ async function main(): Promise<void> {
   await writeJson(receiptPath, proof);
   await writeJson(join(RECEIPTS_DIR, 'latest.json'), proof);
 
-  console.log(JSON.stringify({ status: proof.status, receiptPath, proof }, null, 2));
+  console.log(JSON.stringify({ status: proof.status, receiptPath, proof }, jsonReplacer, 2));
 }
 
 main().catch(error => {
