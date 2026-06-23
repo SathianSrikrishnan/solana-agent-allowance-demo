@@ -16,6 +16,10 @@ The core product thesis is simple:
 Useful agents need spending authority, but users need limits, expiry, revocation, and receipts.
 ```
 
+My angle on this is deliberately practical. I am a Canadian builder and student working through consumer app ideas around children's savings, education, and parent-controlled digital experiences. That means I keep running into the same question: how do you let software do something useful with money without giving it too much authority?
+
+This demo is my smallest useful answer to that question.
+
 ## The Problem: Agent Wallet Access Is Too Broad
 
 If an AI agent is going to help with paid actions, it needs some way to pay. That could mean buying API credits, paying for data, renewing a service, posting a transaction, or handling a small operational workflow.
@@ -106,7 +110,9 @@ Fourth, recurring and subscription-plan flows introduce additional product decis
 
 ## Canadian Relevance
 
-The Superteam Canada context matters because Canadian builders are well-positioned to explore practical, boring, useful automation.
+The Superteam Canada context matters because Canadian builders are well-positioned to explore practical, useful automation.
+
+I am not treating this as an abstract crypto billing primitive. I am trying to understand how it could show up in real products: a parent-approved wallet flow, a child's savings or education app, a small paid research workflow, or a consumer service where an agent can spend only inside a user-defined limit.
 
 Three examples:
 
@@ -141,4 +147,3 @@ I would not start with real-money trading or production private keys. The point 
 - Official subscriptions repository: https://github.com/solana-program/subscriptions
 - Solana subscription plan docs: https://solana.com/docs/payments/subscriptions/subscription-plan
 - Chainstack guide: https://docs.chainstack.com/docs/solana-subscriptions-and-allowances
-
